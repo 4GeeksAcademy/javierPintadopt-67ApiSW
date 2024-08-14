@@ -19,6 +19,7 @@ class User(db.Model):
         }
     
 class Planet(db.Model):
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250), unique=True, nullable=False )
     diameter= db.Column(db.Float, unique=False, nullable=False)
@@ -36,3 +37,32 @@ class Planet(db.Model):
             "gravity": self.gravity,
             "terrain": self.terrain,
         }
+    
+class People(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250), unique=True, nullable=False )
+    email = db.Column(db.String(250), unique=True, nullable=False)
+    
+    def __repr__(self):
+        return '<People %r>' % self.name
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+        }
+
+class Favoritos(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(250), unique=True, nullable=False )
+    email = db.Column(db.String(250), unique=True, nullable=False)  
+    def __repr__(self):
+        return '<Favoritos %r>' % self.name
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "email": self.email,
+        }  
