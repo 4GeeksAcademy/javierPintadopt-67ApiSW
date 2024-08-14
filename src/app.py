@@ -115,6 +115,102 @@ def remove_from_favorites():
     return jsonify({"message": "Planeta eliminado de favoritos"}), 200
 
 
+# Traer lista people
+@app.route('/people', methods=['GET'])
+def get_people():
+    planets = People.query.all()
+    results = [people.serialize() for planet in planets]
+
+    return jsonify(results), 200
+
+# Traer un solo people
+@app.route('/people/<int:planet_id>', methods=['GET'])
+def get_people(people_id):
+    # Buscar el planeta por su ID
+    people = People.query.get(people_id)
+    
+    # Verificar si el planeta existe
+    if people is None:
+        return jsonify({"error": "People no encontrado"}), 404
+    
+    # Serializar el planeta para convertirlo a JSON
+    return jsonify(people.serialize()), 200
+
+    
+#añadir people favoritos
+@app.route('/favorites', methods=['POST'])
+def add_to_favorites():
+    # Obtener los datos de la solicitud
+    data = request.get_json()
+    people_id = data.get('people_id')
+   
+    # Verificar que se recibieron los datos necesarios
+    if not people_id:
+        return jsonify({"error": "people no encontrado por id"}), 400
+
+    # Buscar el people en la base de datos
+    people = People.query.get(people_id)
+    if people is None:
+        return jsonify({"error": "People not found"}), 404
+
+    # Verificar si el favorito ya existe
+    existing_favorite = Favoritos.query.filter_by(name=people.name).first()
+    if existing_favorite:
+        return jsonify({"message": "People existe en favoritos"}), 200
+
+    # Crear un nuevo registro de favorito
+    new_favorite = Favoritos(name=people.name,)
+    db.session.add(new_favorite)
+    db.session.commit()
+
+    return jsonify({"message": "People añadido a favoritos"}), 201
+
+#Eliminar people de favoritos
+@app.route('/favorites', methods=['DELETE'])
+def remove_from_favorites():
+    # Obtener los datos de la solicitud
+    data = request.get_json()
+    people_id = data.get('people_id')
+
+    # Verificar que se recibieron los datos necesarios
+    if not people_id:
+        return jsonify({"error": "No en contrado people por id"}), 400
+
+    # Buscar el planeta en la base de datos
+    people = Peoplet.query.get(people_id)
+    if people is None:
+        return jsonify({"error": "People no encontrado"}), 404
+
+    # Buscar el registro de favorito en la base de datos
+    favorite = Favoritos.query.filter_by(name=people.name,).first()
+    if favorite is None:
+        return jsonify({"error": "People no encontrado en favoritos"}), 404
+
+    # Eliminar el registro de favorito
+    db.session.delete(favorite)
+    db.session.commit()
+
+    return jsonify({"message": "People eliminado de favoritos"}), 200
+
+# Traer favoritos
+@app.route('/favorites', methods=['GET'])
+def get_favorites():
+    # Obtener el email del usuario desde los parámetros de consulta
+    name = request.args.get('name')
+    
+    # Verificar que se recibió el email
+    if not user_name:
+        return jsonify({"error": "nombre no en contrado"}), 400
+
+    # Obtener todos los favoritos del usuario
+    favorites = Favoritos.query.filter_by(name=user_name).all()
+    
+    # Serializar los resultados
+    results = [favorite.serialize() for favorite in favorites]
+
+    return jsonify(results), 200
+
+
 
 
 
