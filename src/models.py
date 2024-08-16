@@ -7,6 +7,7 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    people_fav = db.relationship("People_fav", back_populates="user")
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -41,8 +42,9 @@ class Planet(db.Model):
 class People(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(250), unique=True, nullable=False )
-    email = db.Column(db.String(250), unique=True, nullable=False)
-    
+    mass = db.Column(db.Float, unique=False, nullable=False)
+    hair_color = db.Column(db.String, unique=False, nullable=False)
+    skin_color = db.Column(db.String, unique=False, nullable=False)
     def __repr__(self):
         return '<People %r>' % self.name
 
@@ -50,20 +52,54 @@ class People(db.Model):
         return {
             "id": self.id,
             "name": self.name,
-            "email": self.email,
+            "mass": self.mass,
+            "hair_color": self.hair_color,
+            "skin_color": self.skin_color,
         }
 
-class Favoritos(db.Model):
+class People_fav(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(250), unique=True, nullable=False )
-    email = db.Column(db.String(250), unique=True, nullable=False)  
-    
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    people_id = db.Column(db.Integer, db.ForeignKey("people.id"))
+    user = db.relationship("User", back_populates="people_fav")
+    people = db.relationship("People", back_populates="people_fav")
     def __repr__(self):
-        return '<Favoritos %r>' % self.name
+       return '<People_fav %r>' % self.id
 
     def serialize(self):
         return {
             "id": self.id,
-            "name": self.name,
-            "email": self.email,
-        }  
+            "people_id": self.people_id,
+            "user_id": self.user_id,
+        }
+    
+
+class Planet_fav(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    people_id = db.Column(db.Integer, db.ForeignKey("people.id"))
+    user = db.relationship("User", back_populates="planet_fav")
+    Planet = db.relationship("People", back_populates="planet_fav")
+    def __repr__(self):
+       return '<Planet_fav %r>' % self.id
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "people_id": self.people_id,
+            "user_id": self.user_id,
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
